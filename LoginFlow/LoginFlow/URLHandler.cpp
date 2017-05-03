@@ -7,6 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include "Utility.h"
 
 using namespace std;
 using namespace System;
@@ -213,21 +214,7 @@ bool CURLHandler::FindString(std::vector<std::string> compareFrom, std::string c
 	return ret != compareFrom.end();
 }
 
-//Convert System::String^ to std::string
-std::string CURLHandler::SysStringToCppString(String^ s)
-{
-	auto intPtrString = Marshal::StringToHGlobalAnsi(s);
-	auto rawStringMem = (char*)intPtrString.ToPointer();
-	std::string r(rawStringMem);
-	Marshal::FreeHGlobal(intPtrString);
-	return r;
-}
 
-//convert std::string to System::String^
-String^ CURLHandler::CppStringToSysString(const std::string& s)
-{
-	return Marshal::PtrToStringAnsi((IntPtr)(char*)s.c_str());
-}
 
 //building saml request
 System::String^ CURLHandler::BuildSamlRequest()

@@ -62,6 +62,7 @@ void CLoginFlowDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_RESPONSE, m_eResponse);
 	DDX_Control(pDX, IDC_COMBO_REQUESTS, m_cbRequests);
 	DDX_Control(pDX, IDC_BUTTON_EXECUTE, m_bExecute);
+	DDX_Control(pDX, IDC_LIST_CHART_DATA, m_chartDataList);
 }
 
 BEGIN_MESSAGE_MAP(CLoginFlowDlg, CDialogEx)
@@ -109,9 +110,29 @@ BOOL CLoginFlowDlg::OnInitDialog()
 	m_cbRequests.InsertString(1, "PollChartData");
 	m_cbRequests.SetCurSel(0);
 
+	m_chartData = std::make_unique<CChartData>(m_chartDataList);
+	
+	m_chartDataList.SetExtendedStyle(LVS_EX_GRIDLINES);
+	m_chartDataList.ShowWindow(SW_HIDE);
+
 	//Navigate to get OAPI response --> Login Page
 	m_urlHandler.Navigate(m_cppBrowser);
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CLoginFlowDlg::SetColumn(int iIndex, std::string strColName)
+{
+	LVCOLUMN lvCol;
+	::ZeroMemory((void *)&lvCol, sizeof(LVCOLUMN));
+	lvCol.mask = LVCF_TEXT;
+	m_chartDataList.GetColumn(0, &lvCol);
+	lvCol.pszText = const_cast<LPSTR>(strColName.c_str());
+	m_chartDataList.InsertColumn(iIndex, &lvCol);
+	if (iIndex == 0)
+		m_chartDataList.SetColumnWidth(0, 150);
+	else
+		m_chartDataList.SetColumnWidth(iIndex, 80);
+
 }
 
 void CLoginFlowDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -187,17 +208,55 @@ void CLoginFlowDlg::OnBnClickedButtonExecute()
 	switch (iSelIndex)
 	{
 	case 0: //GetClientsMe request
+		m_chartDataList.ShowWindow(SW_HIDE);
 		m_eResponse.SetWindowText(m_urlHandler.GetClientsMe().c_str());
 		break;
 	case 1: //Chart poll request
 		if (m_pollChartInput.DoModal() == IDOK)
 		{
-			m_eResponse.SetWindowText(m_urlHandler.GetPollChartData(static_cast<std::string>(m_pollChartInput.m_eMode),
-																    static_cast<std::string>(m_pollChartInput.m_strDT), 
-																    static_cast<std::string>(m_pollChartInput.m_eUIC), 
-																    static_cast<std::string>(m_pollChartInput.m_eAssetType), 
-																    static_cast<std::string>(m_pollChartInput.m_eHorizon), 
-																    static_cast<std::string>(m_pollChartInput.m_eCount)).c_str());
+			std::string response = m_urlHandler.GetPollChartData(static_cast<std::string>(m_pollChartInput.m_eMode),
+				static_cast<std::string>(m_pollChartInput.m_strDT),
+				static_cast<std::string>(m_pollChartInput.m_eUIC),
+				static_cast<std::string>(m_pollChartInput.m_eAssetType),
+				static_cast<std::string>(m_pollChartInput.m_eHorizon),
+				static_cast<std::string>(m_pollChartInput.m_eCount));
+			m_eResponse.SetWindowText(response.c_str());
+
+			m_chartDataList.DeleteAllItems();
+			while (m_chartDataList.DeleteColumn(0));
+			//Error received
+			if (response.find("ErrorCode") != std::string::npos)
+				break;
+
+			m_chartDataList.ShowWindow(SW_SHOW);
+			if (response.find("Interest") != std::string::npos)
+			{
+				//It is trade type
+				SetColumn(0, "Timestamp");
+				SetColumn(1, "Open");
+				SetColumn(2, "High");
+				SetColumn(3, "Low");
+				SetColumn(4, "Close");
+				SetColumn(5, "OpenInterest");
+				SetColumn(6, "Volume");
+
+				m_chartData->SetDataInListCtrl(response, true);
+			}
+			else
+			{
+				//it is bidask type
+				SetColumn(0, "Timestamp");
+				SetColumn(1, "OpenBid");
+				SetColumn(2, "HighBid");
+				SetColumn(3, "LowBid");
+				SetColumn(4, "CloseBid");
+				SetColumn(5, "OpenAsk");
+				SetColumn(6, "HighAsk");
+				SetColumn(7, "LowAsk");
+				SetColumn(8, "CloseAsk");
+
+				m_chartData->SetDataInListCtrl(response, false);
+			}
 		}
 		break;
 	default:

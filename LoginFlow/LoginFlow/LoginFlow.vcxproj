@@ -196,6 +196,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChartData.h" />
     <ClInclude Include="ConfigReader.h" />
     <ClInclude Include="LoginFlow.h" />
     <ClInclude Include="LoginFlowDlg.h" />
@@ -206,8 +207,10 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="URLHandler.h" />
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChartData.cpp" />
     <ClCompile Include="ConfigReader.cpp" />
     <ClCompile Include="LoginFlow.cpp" />
     <ClCompile Include="LoginFlowDlg.cpp" />
@@ -220,6 +223,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="URLHandler.cpp" />
+    <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LoginFlow.rc" />
@@ -232,6 +236,7 @@
     <Image Include="res\LoginFlow.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed" />
     <Reference Include="System" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System.Runtime.Serialization" />

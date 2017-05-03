@@ -8,6 +8,7 @@
 #include "URLHandler.h"
 #include "afxwin.h"
 #include "PollChartInputs.h"
+#include "ChartData.h"
 
 // CLoginFlowDlg dialog
 class CLoginFlowDlg : public CDialogEx
@@ -44,6 +45,8 @@ public:
 	afx_msg void OnCbnSelchangeComboRequests();
 
 private:
+	void SetColumn(int iIndex, std::string strColName);
+private:
 	CURLHandler m_urlHandler;
 
 public:
@@ -51,4 +54,6 @@ public:
 	CEdit m_eResponse;
 	CPollChartInputs m_pollChartInput;
 	CButton m_bExecute;
+	CListCtrl m_chartDataList;
+	std::unique_ptr<CChartData> m_chartData;
 };

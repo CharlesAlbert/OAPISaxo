@@ -27,8 +27,6 @@ public:
 private:
 	std::string m_accessToken;
 private:
-	std::string SysStringToCppString(System::String^ s);
-	System::String^ CppStringToSysString(const std::string& s);
 	bool FindString(std::vector<std::string> compareFrom, std::string compateThis);
 
 	System::String^ BuildSamlRequest();
